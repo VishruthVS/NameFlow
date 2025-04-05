@@ -4,8 +4,8 @@ import { ionic } from "@goat-sdk/plugin-ionic";
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { mistral } from '@ai-sdk/mistral';
-import { http, createPublicClient,WalletClient } from "viem";
-import { createWalletClient } from "viem";
+import { http, createPublicClient } from "viem";
+import { createWalletClient, WalletClient } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { celo, sepolia } from "viem/chains";
 import { allora } from '@goat-sdk/plugin-allora'

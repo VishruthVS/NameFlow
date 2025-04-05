@@ -145,4 +145,76 @@ export class CreditScoreService {
         // Otherwise, convert it to bytes32
         return `0x${Buffer.from(input).toString('hex').padStart(64, '0')}` as `0x${string}`;
     }
+
+    async getSymbol() {
+        try {
+            console.log('Attempting to get symbol from:', this.contractAddress);
+            
+            const result = await this.publicClient.readContract({
+                address: this.contractAddress as `0x${string}`,
+                abi: CREDIT_SCORE_ABI,
+                functionName: 'symbol',
+                args: [],
+            });
+
+            console.log('Symbol result:', result);
+            
+            return {
+                contractAddress: this.contractAddress,
+                symbol: result as string,
+                timestamp: new Date().toISOString()
+            };
+        } catch (error) {
+            console.error('Error getting symbol:', error);
+            
+            return {
+                contractAddress: this.contractAddress,
+                error: 'Failed to get symbol',
+                timestamp: new Date().toISOString()
+            };
+        }
+    }
+
+    async getTextRecord(key: string) {
+        try {
+            console.log('Getting text record for key:', key);
+            
+            // First get the baseNode
+            const baseNode = await this.publicClient.readContract({
+                address: this.contractAddress as `0x${string}`,
+                abi: CREDIT_SCORE_ABI,
+                functionName: 'baseNode',
+                args: [],
+            });
+            
+            console.log('Base node:', baseNode);
+            
+            // Then get the text record using the baseNode and key
+            const result = await this.publicClient.readContract({
+                address: this.contractAddress as `0x${string}`,
+                abi: CREDIT_SCORE_ABI,
+                functionName: 'text',
+                args: [baseNode as `0x${string}`, key],
+            });
+
+            console.log('Text record result:', result);
+            
+            return {
+                contractAddress: this.contractAddress,
+                baseNode: baseNode as string,
+                key: key,
+                value: result as string,
+                timestamp: new Date().toISOString()
+            };
+        } catch (error) {
+            console.error('Error getting text record:', error);
+            
+            return {
+                contractAddress: this.contractAddress,
+                key: key,
+                error: 'Failed to get text record',
+                timestamp: new Date().toISOString()
+            };
+        }
+    }
 } 

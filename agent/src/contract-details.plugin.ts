@@ -1,4 +1,4 @@
-import { PluginBase, Tool } from '@goat-sdk/core';
+import { PluginBase } from '@goat-sdk/core';
 import { CreditScoreService } from './contract-details.service';
 import { z } from 'zod';
 
@@ -11,7 +11,7 @@ export class CreditScorePlugin extends PluginBase {
 
     constructor(params: CreditScorePluginCtorParams = {}) {
         super('credit-score', []);
-        this.contractAddress = params.contractAddress || '0x09C13a2780b8AB57b5212a1596f8ec05fE953D9D';
+        this.contractAddress = params.contractAddress || '0xE6Bc22b247F6c294C4C3F2852878F3e4c538098b';
     }
 
     supportsChain(chain: any): boolean {
@@ -56,6 +56,32 @@ export class CreditScorePlugin extends PluginBase {
                 execute: async () => {
                     const service = new CreditScoreService(this.contractAddress);
                     return service.listContractFunctions();
+                }
+            },
+            {
+                name: 'getSymbol',
+                description: 'Get the symbol of the contract',
+                parameters: z.object({}),
+                execute: async () => {
+                    const service = new CreditScoreService(this.contractAddress);
+                    return service.getSymbol();
+                }
+            },
+            {
+                name: 'getTextRecord',
+                description: 'Get the value for a specific text record key',
+                parameters: z.object({
+                    key: z.string().describe('The key to look up')
+                }),
+                execute: async (params: any) => {
+                    if (!params.key) {
+                        return {
+                            error: 'Please provide a key to look up',
+                            timestamp: new Date().toISOString()
+                        };
+                    }
+                    const service = new CreditScoreService(this.contractAddress);
+                    return service.getTextRecord(params.key);
                 }
             }
         ];
