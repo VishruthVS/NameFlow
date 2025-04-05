@@ -72,8 +72,8 @@ const Worldcoin = () => {
           )}
           <div className="flex justify-center mt-6">
             <IDKitWidget
-              app_id="app_f0ef697d1647ae52695abb0c2ca3407c"
-              action="test-app"
+              app_id={process.env.NEXT_PUBLIC_APP_ID as `app_${string}`}
+              action={process.env.ACTION_ID as string}
               onSuccess={onSuccess}
               handleVerify={handleProof}
               verification_level={VerificationLevel.Device}
