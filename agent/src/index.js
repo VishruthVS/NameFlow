@@ -5,7 +5,7 @@ import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { mistral } from '@ai-sdk/mistral';
 import { http, createPublicClient } from "viem";
-import { createWalletClient, WalletClient } from "viem";
+import { createWalletClient } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { celo, sepolia } from "viem/chains";
 import { allora } from '@goat-sdk/plugin-allora'
@@ -13,9 +13,9 @@ import { coingecko } from "@goat-sdk/plugin-coingecko";
 import { ironclad } from "@goat-sdk/plugin-ironclad";
 import { getOnChainTools } from "@goat-sdk/adapter-vercel-ai";
 import { erc20 } from "@goat-sdk/plugin-erc20";
-import { safe ,getAddressPlugin} from "@goat-sdk/wallet-safe";
-import { creditScore } from "./contract-details.plugin";
-import { CreditScoreService } from "./contract-details.service";
+import { safe, getAddressPlugin } from "@goat-sdk/wallet-safe";
+import { creditScore } from "./contract-details.plugin.js";
+import { CreditScoreService } from "./contract-details.service.js";
 import axios from 'axios';
 
 import { sendETH } from "@goat-sdk/wallet-evm";
@@ -30,7 +30,7 @@ const CONTRACT_ADDRESS = '0xE6Bc22b247F6c294C4C3F2852878F3e4c538098b';
 const contractService = new CreditScoreService(CONTRACT_ADDRESS);
 
 // Function to get text record
-export async function getTextRecord(key: string) {
+export async function getTextRecord(key) {
   try {
     if (!key) {
       return {
@@ -51,8 +51,8 @@ export async function getTextRecord(key: string) {
 }
 
 // Add a function to interact with the credit score contract
-async function getCreditScoreFromContract(walletAddress: string) {
-  const contractAddress = '0x09C13a2780b8AB57b5212a1596f8ec05fE953D9D' as `0x${string}`;
+async function getCreditScoreFromContract(walletAddress) {
+  const contractAddress = '0x09C13a2780b8AB57b5212a1596f8ec05fE953D9D';
                           
   try {
     // Create a public client for reading from the contract
@@ -90,7 +90,7 @@ async function getCreditScoreFromContract(walletAddress: string) {
         }
       ],
       functionName: "getCreditScore",
-      args: [walletAddress as `0x${string}`],
+      args: [walletAddress],
     });
 
     console.log("Contract call result:", result);
@@ -102,7 +102,7 @@ async function getCreditScoreFromContract(walletAddress: string) {
 }
 
 // Add a simple function to get credit scores
-async function getCreditScore(walletAddress: string) {
+async function getCreditScore(walletAddress) {
   // Try to get data from the contract first
   const contractResult = await getCreditScoreFromContract(walletAddress);
   
@@ -128,7 +128,7 @@ async function getCreditScore(walletAddress: string) {
   };
 }
 
-function getRatingFromValue(value: number): string {
+function getRatingFromValue(value) {
   if (value >= 800) return "Excellent";
   if (value >= 740) return "Very Good";
   if (value >= 670) return "Good";
@@ -137,9 +137,9 @@ function getRatingFromValue(value: number): string {
 }
 
 require("dotenv").config();
-const account = privateKeyToAccount(process.env.WALLET_PRIVATE_KEY as `0x${string}`);
+const account = privateKeyToAccount(process.env.WALLET_PRIVATE_KEY);
 
-export const walletClient: WalletClient = createWalletClient({
+export const walletClient = createWalletClient({
     account: account,
     transport: http(process.env.RPC_PROVIDER_URL),
     chain: sepolia,
@@ -151,7 +151,7 @@ class CreditScoreTool extends PluginBase {
     super("credit-score", []);
   }
 
-  supportsChain(chain: any): boolean {
+  supportsChain(chain) {
     return true;
   }
 
@@ -162,7 +162,7 @@ class CreditScoreTool extends PluginBase {
       parameters: z.object({
         walletAddress: z.string().describe("The wallet address to get the credit score for")
       }),
-      execute: async (params: any) => {
+      execute: async (params) => {
         return getCreditScore(params.walletAddress);
       }
     }];
@@ -175,9 +175,7 @@ class CreditScoreTool extends PluginBase {
 
     // 2. Get your onchain tools for your wallet
     const tools = await getOnChainTools({
-        //@ts-ignore
         wallet: {
-            //@ts-ignore
             ...viem(walletClient),
             getChain: () => ({ type: 'evm', id: 1 }),
             getCoreTools: () => []
@@ -187,7 +185,6 @@ class CreditScoreTool extends PluginBase {
                 apiKey: process.env.COINGECKO_API_KEY ?? 'default-api-key',
                 isPro: false
             }),
-            //@ts-ignore
             sendETH(),
             allora({ 
                 apiKey: process.env.ALLORA_API_KEY, // Contact the Allora team on Discord for access to API keys
@@ -199,7 +196,6 @@ class CreditScoreTool extends PluginBase {
            ironclad(),
            // getAddressPlugin(), // Ensure it's correctly initialized
             erc20({ tokens: [] }),
-            //@ts-ignore
             creditScore({
                 contractAddress: '0xE6Bc22b247F6c294C4C3F2852878F3e4c538098b'
             })
@@ -214,7 +210,7 @@ class CreditScoreTool extends PluginBase {
     });
 
     while (true) {
-        const prompt = await new Promise<string>((resolve) => {
+        const prompt = await new Promise((resolve) => {
             rl.question('Enter your prompt (or "exit" to quit): ', resolve);
         });
 
@@ -232,7 +228,6 @@ class CreditScoreTool extends PluginBase {
                 headers: {
                     Authorization: `Bearer ${process.env.MISTRAL_API_KEY}`, // Explicitly set API key
                 },
-                //@ts-ignore
                 tools: tools,
                 maxSteps: 10, // Maximum number of tool invocations per request
                 prompt: prompt,
@@ -248,6 +243,5 @@ class CreditScoreTool extends PluginBase {
         } catch (error) {
             console.error(error);
         }
-        console.log("\n-------------------\n");
     }
 })();

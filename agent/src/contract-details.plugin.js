@@ -2,19 +2,13 @@ import { PluginBase } from '@goat-sdk/core';
 import { CreditScoreService } from './contract-details.service';
 import { z } from 'zod';
 
-export type CreditScorePluginCtorParams = {
-    contractAddress?: string;
-};
-
 export class CreditScorePlugin extends PluginBase {
-    private contractAddress: string;
-
-    constructor(params: CreditScorePluginCtorParams = {}) {
+    constructor(params = {}) {
         super('credit-score', []);
         this.contractAddress = params.contractAddress || '0xE6Bc22b247F6c294C4C3F2852878F3e4c538098b';
     }
 
-    supportsChain(chain: any): boolean {
+    supportsChain(chain) {
         return true;
     }
 
@@ -26,7 +20,7 @@ export class CreditScorePlugin extends PluginBase {
                 parameters: z.object({
                     walletAddress: z.string().describe('The wallet address to get the credit score for')
                 }),
-                execute: async (params: any) => {
+                execute: async (params) => {
                     const service = new CreditScoreService(this.contractAddress);
                     return service.getCreditScore(params.walletClient, params.walletAddress);
                 }
@@ -73,7 +67,7 @@ export class CreditScorePlugin extends PluginBase {
                 parameters: z.object({
                     key: z.string().describe('The key to look up')
                 }),
-                execute: async (params: any) => {
+                execute: async (params) => {
                     if (!params.key) {
                         return {
                             error: 'Please provide a key to look up',
@@ -88,7 +82,7 @@ export class CreditScorePlugin extends PluginBase {
     }
 }
 
-export const creditScore = (params: CreditScorePluginCtorParams = {}) => {
+export const creditScore = (params = {}) => {
     return new CreditScorePlugin(params);
 };
 

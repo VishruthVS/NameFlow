@@ -3,7 +3,7 @@
 # Start the backend API server
 echo "Starting the backend API server..."
 cd agent
-npx ts-node api-server.ts &
+npx ts-node src/express-api-server.ts &
 BACKEND_PID=$!
 
 # Wait for the backend to start

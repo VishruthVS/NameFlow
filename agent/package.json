@@ -1,13 +1,14 @@
 {
   "name": "agent",
   "version": "1.0.0",
-  "description": "TypeScript agent project",
-  "main": "dist/index.js",
+  "description": "JavaScript agent project",
+  "main": "src/server.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "watch": "tsc -w"
+    "build": "echo 'No build step needed for JavaScript'",
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "watch": "nodemon src/server.js",
+    "api": "node src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/node": "^22.14.0",
+    "nodemon": "^3.0.3",
     "typescript": "^5.8.3"
   },
   "dependencies": {
@@ -32,7 +34,10 @@
     "@goat-sdk/wallet-safe": "^0.1.5",
     "@goat-sdk/wallet-viem": "^0.2.10",
     "ai": "^4.2.5",
+    "axios": "^1.6.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "express": "^4.19.2",
     "viem": "^2.23.15",
     "zod": "^3.22.4"
   }

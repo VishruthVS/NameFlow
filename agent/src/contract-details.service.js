@@ -1,12 +1,9 @@
-import { WalletClient, PublicClient, createPublicClient, http } from 'viem';
-import { CREDIT_SCORE_ABI } from './contract-details.abi';
+import { createPublicClient, http } from 'viem';
+import { CREDIT_SCORE_ABI } from './contract-details.abi.js';
 import { sepolia } from 'viem/chains';
 
 export class CreditScoreService {
-    private contractAddress: string;
-    private publicClient: PublicClient;
-
-    constructor(contractAddress: string) {
+    constructor(contractAddress) {
         this.contractAddress = contractAddress;
         // Create a public client for reading from the contract
         this.publicClient = createPublicClient({
@@ -15,12 +12,12 @@ export class CreditScoreService {
         });
     }
 
-    async getCreditScore(walletClient: WalletClient, address: string) {
+    async getCreditScore(walletClient, address) {
         try {
             console.log('Attempting to read from credit score contract at:', this.contractAddress);
             
             const result = await this.publicClient.readContract({
-                address: this.contractAddress as `0x${string}`,
+                address: this.contractAddress,
                 abi: CREDIT_SCORE_ABI,
                 functionName: 'addr',
                 args: [this.ensureBytes32(address)],
@@ -29,7 +26,7 @@ export class CreditScoreService {
             console.log('Contract result:', result);
             
             // Handle the result based on what the function returns
-            const resolvedAddress = result as string;
+            const resolvedAddress = result;
             
             return {
                 walletAddress: address,
@@ -57,7 +54,7 @@ export class CreditScoreService {
             console.log('Attempting to get contract owner from:', this.contractAddress);
             
             const result = await this.publicClient.readContract({
-                address: this.contractAddress as `0x${string}`,
+                address: this.contractAddress,
                 abi: CREDIT_SCORE_ABI,
                 functionName: 'owner',
                 args: [],
@@ -67,7 +64,7 @@ export class CreditScoreService {
             
             return {
                 contractAddress: this.contractAddress,
-                owner: result as string,
+                owner: result,
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
@@ -86,7 +83,7 @@ export class CreditScoreService {
             console.log('Attempting to get baseNode from:', this.contractAddress);
             
             const result = await this.publicClient.readContract({
-                address: this.contractAddress as `0x${string}`,
+                address: this.contractAddress,
                 abi: CREDIT_SCORE_ABI,
                 functionName: 'baseNode',
                 args: [],
@@ -96,7 +93,7 @@ export class CreditScoreService {
             
             return {
                 contractAddress: this.contractAddress,
-                baseNode: result as `0x${string}`,
+                baseNode: result,
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
@@ -126,7 +123,7 @@ export class CreditScoreService {
         };
     }
 
-    private getRatingFromValue(value: number): string {
+    getRatingFromValue(value) {
         if (value >= 800) return "Excellent";
         if (value >= 740) return "Very Good";
         if (value >= 670) return "Good";
@@ -135,15 +132,15 @@ export class CreditScoreService {
     }
 
     // Helper function to ensure a string is a valid bytes32
-    private ensureBytes32(input: string): `0x${string}` {
+    ensureBytes32(input) {
         // If it's already a hex string starting with 0x, return it
         if (input.startsWith('0x')) {
             // Ensure it's 66 characters long (0x + 64 hex chars)
-            return input.padEnd(66, '0').slice(0, 66) as `0x${string}`;
+            return input.padEnd(66, '0').slice(0, 66);
         }
         
         // Otherwise, convert it to bytes32
-        return `0x${Buffer.from(input).toString('hex').padStart(64, '0')}` as `0x${string}`;
+        return `0x${Buffer.from(input).toString('hex').padStart(64, '0')}`;
     }
 
     async getSymbol() {
@@ -151,7 +148,7 @@ export class CreditScoreService {
             console.log('Attempting to get symbol from:', this.contractAddress);
             
             const result = await this.publicClient.readContract({
-                address: this.contractAddress as `0x${string}`,
+                address: this.contractAddress,
                 abi: CREDIT_SCORE_ABI,
                 functionName: 'symbol',
                 args: [],
@@ -161,7 +158,7 @@ export class CreditScoreService {
             
             return {
                 contractAddress: this.contractAddress,
-                symbol: result as string,
+                symbol: result,
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
@@ -175,13 +172,13 @@ export class CreditScoreService {
         }
     }
 
-    async getTextRecord(key: string) {
+    async getTextRecord(key) {
         try {
             console.log('Getting text record for key:', key);
             
             // First get the baseNode
             const baseNode = await this.publicClient.readContract({
-                address: this.contractAddress as `0x${string}`,
+                address: this.contractAddress,
                 abi: CREDIT_SCORE_ABI,
                 functionName: 'baseNode',
                 args: [],
@@ -191,19 +188,19 @@ export class CreditScoreService {
             
             // Then get the text record using the baseNode and key
             const result = await this.publicClient.readContract({
-                address: this.contractAddress as `0x${string}`,
+                address: this.contractAddress,
                 abi: CREDIT_SCORE_ABI,
                 functionName: 'text',
-                args: [baseNode as `0x${string}`, key],
+                args: [baseNode, key],
             });
 
             console.log('Text record result:', result);
             
             return {
                 contractAddress: this.contractAddress,
-                baseNode: baseNode as string,
+                baseNode: baseNode,
                 key: key,
-                value: result as string,
+                value: result,
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
