@@ -18,19 +18,26 @@ interface IVerifyRequest {
   signal?: string;
 }
 
-if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.ACTION_ID) {
-  throw new Error('Environment variables NEXT_PUBLIC_APP_ID and ACTION_ID must be set');
+if (!process.env.NEXT_PUBLIC_APP_ID || !process.env.NEXT_PUBLIC_ACTION_ID) {
+  throw new Error('Environment variables NEXT_PUBLIC_APP_ID and NEXT_PUBLIC_ACTION_ID must be set');
 }
 
 export async function POST(req: Request) {
   try {
+    const appId = process.env.NEXT_PUBLIC_APP_ID;
+    const actionId = process.env.NEXT_PUBLIC_ACTION_ID;
+    
+    if (!appId?.startsWith('app_') || !actionId) {
+      throw new Error('Invalid or missing APP_ID or ACTION_ID');
+    }
+
     const body = await req.json();
     console.log("Backend received body:", body);
     
     const verifyRes = await verifyCloudProof(
       body.proof, 
-      process.env.NEXT_PUBLIC_APP_ID as `app_${string}`, 
-      process.env.ACTION_ID as string, 
+      appId as `app_${string}`,
+      actionId, 
       body.signal
     );
     console.log("Backend verification response:", verifyRes);
