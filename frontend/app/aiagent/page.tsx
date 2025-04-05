@@ -105,7 +105,7 @@ export default function AIAgentPage() {
           <li>Base node (e.g., &quot;What&apos;s the base node?&quot;)</li>
           <li>Symbol (e.g., &quot;What&apos;s the symbol?&quot;)</li>
         </ul>
-        <p className="text-sm text-gray-600">Note: Make sure the backend API server is running at http://localhost:3000</p>
+        <p className="text-sm text-gray-600">Note: The backend API server is running at https://ethglobal-taipei-4xxj9.ondigitalocean.app</p>
       </div>
       
       <div className="bg-gray-100 rounded-md border border-gray-300 mb-6 h-96 overflow-y-auto p-4">

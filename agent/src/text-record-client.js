@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API base URL
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://ethglobal-taipei-4xxj9.ondigitalocean.app/api';
 
 // Function to get text record from the API
 export async function fetchTextRecord(key) {
@@ -62,7 +62,7 @@ export async function fetchSymbol() {
 
 // Example usage
 console.log('To use this client:');
-console.log('1. Start the API server with: node server.js');
+console.log('1. The API server is already deployed at: https://ethglobal-taipei-4xxj9.ondigitalocean.app/');
 console.log('2. Then make requests with:');
 console.log('   fetchTextRecord("description").then(result => console.log(result));');
 console.log('   fetchContractOwner().then(result => console.log(result));');

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Backend API base URL
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://ethglobal-taipei-4xxj9.ondigitalocean.app/api';
 
 export async function POST(request: NextRequest) {
   try {

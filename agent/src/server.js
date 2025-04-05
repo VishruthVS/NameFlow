@@ -95,7 +95,11 @@ app.use((req, res) => {
 // Start server
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  
+  console.log(`Available endpoints:`);
+  console.log(`- POST https://ethglobal-taipei-4xxj9.ondigitalocean.app/api/text-record - Get a text record (requires key in body)`);
+  console.log(`- GET https://ethglobal-taipei-4xxj9.ondigitalocean.app/api/owner - Get the contract owner`);
+  console.log(`- GET https://ethglobal-taipei-4xxj9.ondigitalocean.app/api/base-node - Get the base node`);
+  console.log(`- GET https://ethglobal-taipei-4xxj9.ondigitalocean.app/api/symbol - Get the contract symbol`);
 });
 
 // Keep the process running
