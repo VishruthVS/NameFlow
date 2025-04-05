@@ -15,11 +15,40 @@ import { getOnChainTools } from "@goat-sdk/adapter-vercel-ai";
 import { erc20 } from "@goat-sdk/plugin-erc20";
 import { safe ,getAddressPlugin} from "@goat-sdk/wallet-safe";
 import { creditScore } from "./contract-details.plugin";
+import { CreditScoreService } from "./contract-details.service";
+import axios from 'axios';
 
 import { sendETH } from "@goat-sdk/wallet-evm";
 import { viem } from "@goat-sdk/wallet-viem";
 import { z } from "zod";
 import { PluginBase } from "@goat-sdk/core";
+
+// Contract address
+const CONTRACT_ADDRESS = '0xE6Bc22b247F6c294C4C3F2852878F3e4c538098b';
+
+// Create service instance
+const contractService = new CreditScoreService(CONTRACT_ADDRESS);
+
+// Function to get text record
+export async function getTextRecord(key: string) {
+  try {
+    if (!key) {
+      return {
+        error: 'Please provide a key to look up',
+        timestamp: new Date().toISOString()
+      };
+    }
+    
+    const result = await contractService.getTextRecord(key);
+    return result;
+  } catch (error) {
+    console.error('Error getting text record:', error);
+    return {
+      error: 'Failed to get text record',
+      timestamp: new Date().toISOString()
+    };
+  }
+}
 
 // Add a function to interact with the credit score contract
 async function getCreditScoreFromContract(walletAddress: string) {
