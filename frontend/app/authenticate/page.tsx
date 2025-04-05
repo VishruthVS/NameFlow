@@ -110,7 +110,7 @@ const Worldcoin = () => {
           <b className="text-left">Note:</b>
           <p>
             You can either scan the QR code from a simulator or click on the QR code to copy it.
-            Then select "paste code" option in simulator and paste the code. Choose "verify with orb"
+            Then select &quot;paste code&quot; option in simulator and paste the code. Choose &quot;verify with orb&quot;
             and wait until verification is done.
           </p>
           <p>
