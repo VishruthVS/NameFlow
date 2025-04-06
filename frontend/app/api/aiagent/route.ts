@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Backend API base URL
-const API_BASE_URL = 'https://ethglobal-taipei-4xxj9.ondigitalocean.app/api';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 export async function POST(request: NextRequest) {
   try {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
               label: name,
-              owner: '0x87D46758159B4B9C953bC99938784dAeB8329395' // Default owner for testing
+              owner: '0x657Ec760F0689119DB61155bCa25cfAc5E286Dba' // Default owner for testing
             })
           });
           const registerData = await registerResponse.json();
@@ -98,59 +98,28 @@ export async function POST(request: NextRequest) {
         response = 'Please specify a name to register.';
       }
     }
-    // Check if the user is asking for a text record
-    else if (lowerMessage.includes('text record') || 
-        lowerMessage.includes('get text') || 
-        lowerMessage.includes('text for') ||
-        lowerMessage.includes('com.discord') ||
-        lowerMessage.includes('com.twitter') ||
-        lowerMessage.includes('email') ||
-        lowerMessage.includes('url') ||
-        lowerMessage.includes('avatar')) {
-      
+    // Check if the user is asking for text records
+    else if (lowerMessage.includes('text record') || lowerMessage.includes('get text record')) {
       // Extract the key from the message
-      let key = '';
-      
-      // Check for common keys
-      if (lowerMessage.includes('com.discord')) {
-        key = 'com.discord';
-      } else if (lowerMessage.includes('com.twitter')) {
-        key = 'com.twitter';
-      } else if (lowerMessage.includes('email')) {
-        key = 'email';
-      } else if (lowerMessage.includes('url')) {
-        key = 'url';
-      } else if (lowerMessage.includes('avatar')) {
-        key = 'avatar';
-      } else {
-        // Try to extract a key from the message
-        const keyMatch = message.match(/for\s+([a-zA-Z0-9._]+)/i);
-        if (keyMatch && keyMatch[1]) {
-          key = keyMatch[1];
+      const keyMatch = lowerMessage.match(/(?:text record|get text record)\s+(?:for\s+)?["']?([a-zA-Z0-9.]+)["']?/);
+      if (keyMatch && keyMatch[1]) {
+        const key = keyMatch[1];
+        const textRecordResponse = await fetch(`${API_BASE_URL}/text-record`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key })
+        });
+        const textRecordData = await textRecordResponse.json();
+        
+        if (textRecordData.error) {
+          response = `Error getting text record: ${textRecordData.error}`;
         } else {
-          return NextResponse.json({
-            response: "I couldn't determine which text record you're looking for. Please specify a key like 'com.discord', 'com.twitter', 'email', 'url', or 'avatar'."
-          });
+          response = `Text record for "${key}": ${textRecordData.value}`;
         }
-      }
-      
-      // Call the text record API
-      const textRecordResponse = await fetch(`${API_BASE_URL}/text-record`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ key }),
-      });
-      
-      const textRecordData = await textRecordResponse.json();
-      
-      if (textRecordData.error) {
-        response = `Error getting text record for key "${key}": ${textRecordData.error}`;
       } else {
-        response = `Text record for key "${key}": ${textRecordData.value || 'Not found'}`;
+        response = 'Please specify a key to get the text record for.';
       }
-    } 
+    }
     // Check if the user is asking for the contract owner
     else if (lowerMessage.includes('owner') || lowerMessage.includes('who owns')) {
       const ownerResponse = await fetch(`${API_BASE_URL}/owner`);
@@ -197,9 +166,8 @@ export async function POST(request: NextRequest) {
     }
     
     return NextResponse.json({ response });
-    
   } catch (error) {
-    console.error('Error processing AI agent request:', error);
+    console.error('Error processing request:', error);
     return NextResponse.json(
       { error: 'Failed to process request' },
       { status: 500 }

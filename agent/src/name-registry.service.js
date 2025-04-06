@@ -1,5 +1,5 @@
 import { createPublicClient, http } from 'viem';
-import { sepolia } from 'viem/chains';
+import { baseSepolia } from 'viem/chains';
 
 // ABI for the name registry contract
 const NAME_REGISTRY_ABI = [
@@ -141,7 +141,15 @@ export class NameRegistryService {
         this.contractAddress = contractAddress;
         // Create a public client for reading from the contract
         this.publicClient = createPublicClient({
-            chain: sepolia,
+            chain: {
+                ...baseSepolia,
+                rpcUrls: {
+                    ...baseSepolia.rpcUrls,
+                    default: {
+                        http: ['https://sepolia.base.org']
+                    }
+                }
+            },
             transport: http('https://sepolia.base.org')
         });
     }
@@ -151,7 +159,7 @@ export class NameRegistryService {
         try {
             console.log('Checking if label is available:', label);
             
-            // Call the available function
+            // Call the available function on the contract
             const result = await this.publicClient.readContract({
                 address: this.contractAddress,
                 abi: NAME_REGISTRY_ABI,
@@ -170,10 +178,20 @@ export class NameRegistryService {
         } catch (error) {
             console.error('Error checking if label is available:', error);
             
+            // Check if it's a contract error
+            if (error.cause && error.cause.code === 'CALL_EXCEPTION') {
+                return {
+                    contractAddress: this.contractAddress,
+                    label: label,
+                    error: 'Contract call failed: ' + (error.cause.data || error.message),
+                    timestamp: new Date().toISOString()
+                };
+            }
+            
             return {
                 contractAddress: this.contractAddress,
                 label: label,
-                error: 'Failed to check if label is available',
+                error: 'Failed to check if label is available: ' + error.message,
                 timestamp: new Date().toISOString()
             };
         }
@@ -189,7 +207,7 @@ export class NameRegistryService {
                 throw new Error('Missing required parameters: walletClient, label, or owner');
             }
             
-            // Call the register function
+            // Call the register function on the contract
             const hash = await walletClient.writeContract({
                 address: this.contractAddress,
                 abi: NAME_REGISTRY_ABI,
@@ -209,11 +227,22 @@ export class NameRegistryService {
         } catch (error) {
             console.error('Error registering name:', error);
             
+            // Check if it's a contract error
+            if (error.cause && error.cause.code === 'CALL_EXCEPTION') {
+                return {
+                    contractAddress: this.contractAddress,
+                    label: label,
+                    owner: owner,
+                    error: 'Contract call failed: ' + (error.cause.data || error.message),
+                    timestamp: new Date().toISOString()
+                };
+            }
+            
             return {
                 contractAddress: this.contractAddress,
                 label: label,
                 owner: owner,
-                error: error.message || 'Failed to register name',
+                error: 'Failed to register name: ' + error.message,
                 timestamp: new Date().toISOString()
             };
         }
