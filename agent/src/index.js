@@ -15,7 +15,7 @@ import { getOnChainTools } from "@goat-sdk/adapter-vercel-ai";
 import { erc20 } from "@goat-sdk/plugin-erc20";
 import { safe, getAddressPlugin } from "@goat-sdk/wallet-safe";
 import { creditScore } from "./contract-details.plugin.js";
-import { nameRegistry } from "./name-registry.plugin.js";
+import { nameRegistryTool } from "./name-registry-tool.js";
 import { CreditScoreService } from "./contract-details.service.js";
 import axios from 'axios';
 
@@ -188,21 +188,18 @@ class CreditScoreTool extends PluginBase {
             }),
             sendETH(),
             allora({ 
-                apiKey: process.env.ALLORA_API_KEY, // Contact the Allora team on Discord for access to API keys
+                apiKey: process.env.ALLORA_API_KEY,
             }),
             coinmarketcap({
-                apiKey: process.env.COINMARKETCAP_API_KEY??'default-api-key' // Get it from: https://coinmarketcap.com/api/documentation/v1/
-           }),
-           ionic(),
-           ironclad(),
-           // getAddressPlugin(), // Ensure it's correctly initialized
+                apiKey: process.env.COINMARKETCAP_API_KEY??'default-api-key'
+            }),
+            ionic(),
+            ironclad(),
             erc20({ tokens: [] }),
             creditScore({
                 contractAddress: '0xE6Bc22b247F6c294C4C3F2852878F3e4c538098b'
             }),
-            nameRegistry({
-                contractAddress: '0x09c13a2780b8ab57b5212a1596f8ec05fe953d9d'
-            })
+            nameRegistryTool()
         ],
     });
     

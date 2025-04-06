@@ -1,11 +1,15 @@
-import { PluginBase } from './plugin-base.js';
+import { PluginBase } from '@goat-sdk/core';
 import { z } from 'zod';
 import { NameRegistryService } from './name-registry.service.js';
 
 export class NameRegistryPlugin extends PluginBase {
     constructor(params = {}) {
-        super(params);
+        super('name-registry', []);
         this.contractAddress = params.contractAddress || '0x09c13a2780b8ab57b5212a1596f8ec05fe953d9d';
+    }
+
+    supportsChain(chain) {
+        return true;
     }
 
     getTools() {
