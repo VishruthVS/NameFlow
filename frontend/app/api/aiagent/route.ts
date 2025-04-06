@@ -18,8 +18,88 @@ export async function POST(request: NextRequest) {
     const lowerMessage = message.toLowerCase();
     let response = '';
     
+    // Check if the user is asking for name availability
+    if (lowerMessage.includes('available') || lowerMessage.includes('check if') || lowerMessage.includes('is available')) {
+      // Extract the name from the message - improved regex pattern
+      const nameMatch = lowerMessage.match(/(?:available|check if|is available)\s+(?:the name\s+)?["']?([a-zA-Z0-9]+)["']?/i);
+      if (nameMatch && nameMatch[1]) {
+        const name = nameMatch[1];
+        const availableResponse = await fetch(`${API_BASE_URL}/available`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label: name })
+        });
+        const availableData = await availableResponse.json();
+        
+        if (availableData.error) {
+          response = `Error checking availability: ${availableData.error}`;
+        } else {
+          response = `The name "${name}" is ${availableData.available ? 'available' : 'not available'} for registration.`;
+        }
+      } else {
+        // Try an alternative pattern for "is the name X available"
+        const altNameMatch = lowerMessage.match(/is\s+(?:the name\s+)?["']?([a-zA-Z0-9]+)["']?\s+available/i);
+        if (altNameMatch && altNameMatch[1]) {
+          const name = altNameMatch[1];
+          const availableResponse = await fetch(`${API_BASE_URL}/available`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ label: name })
+          });
+          const availableData = await availableResponse.json();
+          
+          if (availableData.error) {
+            response = `Error checking availability: ${availableData.error}`;
+          } else {
+            response = `The name "${name}" is ${availableData.available ? 'available' : 'not available'} for registration.`;
+          }
+        } else {
+          response = 'Please specify a name to check availability.';
+        }
+      }
+    }
+    // Check if the user wants to register a name
+    else if (lowerMessage.includes('register') || lowerMessage.includes('register the name')) {
+      // Extract the name from the message
+      const nameMatch = lowerMessage.match(/(?:register|register the name)\s+["']?([a-zA-Z0-9]+)["']?/);
+      if (nameMatch && nameMatch[1]) {
+        const name = nameMatch[1];
+        // First check if the name is available
+        const availableResponse = await fetch(`${API_BASE_URL}/available`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label: name })
+        });
+        const availableData = await availableResponse.json();
+        
+        if (availableData.error) {
+          response = `Error checking availability: ${availableData.error}`;
+        } else if (!availableData.available) {
+          response = `The name "${name}" is not available for registration.`;
+        } else {
+          // If available, proceed with registration
+          const registerResponse = await fetch(`${API_BASE_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              label: name,
+              owner: '0x87D46758159B4B9C953bC99938784dAeB8329395' // Default owner for testing
+            })
+          });
+          const registerData = await registerResponse.json();
+          
+          if (registerData.error) {
+            response = `Error registering name: ${registerData.error}`;
+          } else {
+            response = `Successfully registered the name "${name}"!\n\nDetails:\n- Contract Address: ${registerData.contractAddress}\n- Owner: ${registerData.owner}\n- Transaction Hash: ${registerData.transactionHash}\n- Timestamp: ${registerData.timestamp}`;
+          }
+        }
+      } else {
+        response = 'Please specify a name to register.';
+      }
+    }
     // Check if the user is asking for a text record
-    if (lowerMessage.includes('text record') || 
+    else if (lowerMessage.includes('text record') || 
         lowerMessage.includes('get text') || 
         lowerMessage.includes('text for') ||
         lowerMessage.includes('com.discord') ||
@@ -108,10 +188,12 @@ export async function POST(request: NextRequest) {
     else {
       response = `I'm not sure what you're asking for. You can ask me about:
       
-1. Text records (e.g., "Get text record for com.discord")
-2. Contract owner (e.g., "Who owns the contract?")
-3. Base node (e.g., "What's the base node?")
-4. Symbol (e.g., "What's the symbol?")`;
+1. Name availability (e.g., "Is the name 'testname123' available?")
+2. Name registration (e.g., "Register the name 'mynewname'")
+3. Text records (e.g., "Get text record for com.discord")
+4. Contract owner (e.g., "Who owns the contract?")
+5. Base node (e.g., "What's the base node?")
+6. Symbol (e.g., "What's the symbol?")`;
     }
     
     return NextResponse.json({ response });

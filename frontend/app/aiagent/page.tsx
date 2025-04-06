@@ -100,6 +100,8 @@ export default function AIAgentPage() {
         <h2 className="text-lg font-medium mb-2">How to use this AI Agent</h2>
         <p className="mb-2">You can ask the AI Agent about:</p>
         <ul className="list-disc pl-5 mb-2 space-y-1">
+          <li>Name availability (e.g., &quot;Is the name &apos;testname123&apos; available?&quot;)</li>
+          <li>Name registration (e.g., &quot;Register the name &apos;mynewname&apos;&quot;)</li>
           <li>Text records (e.g., &quot;Get text record for com.discord&quot;)</li>
           <li>Contract owner (e.g., &quot;Who owns the contract?&quot;)</li>
           <li>Base node (e.g., &quot;What&apos;s the base node?&quot;)</li>
