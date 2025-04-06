@@ -56,74 +56,51 @@ const Worldcoin = () => {
   };
 
   return (
-    <div>
-      <div className="min-h-[60vh] flex flex-row items-center justify-center bg-gray-100 space-x-6">
-        {/* Human Verification Box */}
-        <div className="bg-white text-black shadow-md rounded-lg p-8 max-w-md w-full">
-          <h1 className="text-2xl font-bold mb-4 text-center">Human Verification</h1>
-          <p className="mb-2 text-center">
-            Please confirm your identity by verifying that you are a human. This step helps us prevent automated access
-            and maintain security.
-          </p>
-          {verificationStatus && (
-            <p className={`text-center mb-4 ${verificationStatus.includes("successful") ? "text-green-600" : "text-red-600"} font-semibold`}>
-              {verificationStatus}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
+      <div className="container mx-auto px-4">
+        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Identity Verification</h1>
+        
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 max-w-5xl mx-auto">
+          {/* Human Verification Box */}
+          <div className="bg-white rounded-xl p-8 w-full md:w-1/2 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+            <h2 className="text-2xl font-bold mb-4 text-center text-indigo-700">Human Verification</h2>
+            <p className="mb-4 text-center text-gray-600">
+              Complete a quick verification to access our AI Agent. This ensures a secure environment for all users and helps us provide personalized assistance.
             </p>
-          )}
-          <div className="flex justify-center mt-6">
-            <IDKitWidget
-              app_id={process.env.NEXT_PUBLIC_APP_ID as `app_${string}`}
-              action={process.env.NEXT_PUBLIC_ACTION_ID as string}
-              onSuccess={onSuccess}
-              handleVerify={handleProof}
-              verification_level={VerificationLevel.Device}
-            >
-              {({ open }) => (
-                <button
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                  onClick={open}
-                >
-                  Verify with World ID
-                </button>
-              )}
-            </IDKitWidget>
+            {verificationStatus && (
+              <div className={`p-3 rounded-md mb-4 ${
+                verificationStatus.includes("successful") 
+                  ? "bg-green-50 text-green-700 border border-green-200" 
+                  : "bg-red-50 text-red-700 border border-red-200"
+              }`}>
+                <p className="text-center font-medium">{verificationStatus}</p>
+              </div>
+            )}
+            <div className="flex justify-center mt-6">
+              <IDKitWidget
+                app_id={process.env.NEXT_PUBLIC_APP_ID as `app_${string}`}
+                action={process.env.NEXT_PUBLIC_ACTION_ID as string}
+                onSuccess={onSuccess}
+                handleVerify={handleProof}
+                verification_level={VerificationLevel.Device}
+              >
+                {({ open }) => (
+                  <button
+                    className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors duration-200 font-medium shadow-md hover:shadow-lg"
+                    onClick={open}
+                  >
+                    Verify with World ID
+                  </button>
+                )}
+              </IDKitWidget>
+            </div>
           </div>
-        </div>
 
-        {/* Worldcoin Verification Box */}
-        <div className="bg-white text-black shadow-md rounded-lg p-8 max-w-md w-full">
-          <h1 className="text-2xl font-bold mb-4 text-center">Worldcoin Verification</h1>
-          <p className="mb-2 text-center">
-            Verify your identity using the Worldcoin simulator. This innovative tool ensures the authenticity of user
-            identities through advanced verification methods.
-          </p>
-          <p className="mb-6 text-center">
-            Access the simulator here:
-            <span className="text-orange-600 font-semibold ml-1">
-              <Link href="https://simulator.worldcoin.org">Worldcoin Simulator</Link>
-            </span>
-          </p>
+         
+         
         </div>
-      </div>
-      <div className="bg-gray-100 text-black">
-        <div className="flex px-8 mx-7 flex-col items-center w-[90vw]">
-          <b className="text-left">Note:</b>
-          <p>
-            You can either scan the QR code from a simulator or click on the QR code to copy it.
-            Then select &quot;paste code&quot; option in simulator and paste the code. Choose &quot;verify with orb&quot;
-            and wait until verification is done.
-          </p>
-          <p>
-            <b>Make sure the identity is orb and device verified</b>
-          </p>
-          <p>
-            For the time being If you are not able to verify it, just move to the Flash Loan contract deploy page by
-            clicking{" "}
-            <Link href="/arbitrage/base-tenderly" className="text-orange-500">
-              here
-            </Link>
-          </p>
-        </div>
+        
+       
       </div>
     </div>
   );
