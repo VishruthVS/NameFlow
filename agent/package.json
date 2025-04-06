@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "JavaScript agent project",
   "main": "src/server.js",
+  "type": "module",
   "scripts": {
     "build": "echo 'No build step needed for JavaScript'",
     "start": "node src/server.js",
