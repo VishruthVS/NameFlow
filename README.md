@@ -40,7 +40,6 @@ Authoritative registry on Celo Mainnet:
 ## Durin L2Registrar Setup
 
 ### Contract Addresses
-- L2Registrar: `0x09C13a2780b8AB57b5212a1596f8ec05fE953D9D`
 - L2Registry: `0xe6bc22b247f6c294c4c3f2852878f3e4c538098b`
 
 ### Setup Process
