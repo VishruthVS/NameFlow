@@ -12,7 +12,7 @@ const Worldcoin = () => {
   const onSuccess = () => {
     setVerificationStatus("Verification successful! Redirecting...");
     setTimeout(() => {
-      router.push("/hello");
+      router.push("/aiagent");
     }, 2000);
   };
 
@@ -42,7 +42,7 @@ const Worldcoin = () => {
         console.log("Verification successful!");
         setVerificationStatus("Verification successful! Redirecting...");
         setTimeout(() => {
-          router.push("/hello");
+          router.push("/aiagent");
         }, 2000);
       } else {
         console.error("Verification failed with details:", data);
